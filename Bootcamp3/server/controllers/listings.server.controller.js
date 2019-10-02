@@ -22,11 +22,11 @@ var mongoose = require('mongoose'),
  */
 
 /* Create a listing */
+try{
 exports.create = function(req, res) {
 
   /* Instantiate a Listing */
   var listing = new Listing(req.body);
-
   /* save the coordinates (located in req.results if there is an address property) */
   if(req.results) {
     listing.coordinates = {
@@ -56,7 +56,42 @@ exports.read = function(req, res) {
 /* Update a listing - note the order in which this function is called by the router*/
 exports.update = function(req, res) {
   var listing = req.listing;
+  if (!listing.code){
+    throw err;
+  }
+  else {
+  Listing.findById(listing.code, function (err, contact) {
 
+    //Check for an error
+    if (err)
+    res.send(err);
+    
+    //Update the building info
+    listing.code = req.body.code;
+    listing.name = req.body.name;
+            
+    if (req.results){
+      listing.coordinates.latitude = req.results.latitude;
+      listing.coordinates.longitude = req.results.longitude;
+      listing.address = req.body.address;
+    }
+
+    });
+    if (!listing.code){
+      throw err;
+    }
+    else{
+      listing.save(function(err) {
+        if(err) {
+          console.log(err);
+          res.status(400).send(err);
+        } else {
+        res.send(listing);
+        console.log(listing)
+        }
+        });
+    }
+  }
   /* Replace the listings's properties with the new properties found in req.body */
  
   /*save the coordinates (located in req.results if there is an address property) */
@@ -68,14 +103,21 @@ exports.update = function(req, res) {
 /* Delete a listing */
 exports.delete = function(req, res) {
   var listing = req.listing;
-
   /* Add your code to remove the listins */
-
+  Listing.findOneAndDelete({ 'code': listing.code}, function (err, listing) {
+    if (err) return handleError(err);
+    console.log(listing);
+  });
 };
 
 /* Retreive all the directory listings, sorted alphabetically by listing code */
 exports.list = function(req, res) {
   /* Add your code */
+  Listing.find({}, function (err, listing) {
+    if (err) return handleError(err);
+    //console.log(listing);
+    res.send(listing);
+  }); //add sorted functionality
 };
 
 /* 
@@ -88,6 +130,7 @@ exports.list = function(req, res) {
 exports.listingByID = function(req, res, next, id) {
   Listing.findById(id).exec(function(err, listing) {
     if(err) {
+      console.log(err)
       res.status(400).send(err);
     } else {
       req.listing = listing;
@@ -95,3 +138,7 @@ exports.listingByID = function(req, res, next, id) {
     }
   });
 };
+}
+catch(err){
+  console.log(err);
+}

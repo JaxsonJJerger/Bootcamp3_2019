@@ -6,10 +6,11 @@ var path = require('path'),
     config = require('./config'),
     listingsRouter = require('../routes/listings.server.routes'), 
     getCoordinates = require('../controllers/coordinates.server.controller.js');
-
+    
 module.exports.init = function() {
+  
   //connect to database
-  mongoose.connect(config.db.uri, { useNewUrlParser: true });
+  mongoose.connect(config.db.uri, { useNewUrlParser: true, useUnifiedTopology: true });
     mongoose.set('useCreateIndex', true);
     mongoose.set('useFindAndModify', false);
 
