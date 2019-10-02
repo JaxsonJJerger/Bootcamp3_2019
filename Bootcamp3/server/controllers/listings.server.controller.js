@@ -60,37 +60,51 @@ exports.update = function(req, res) {
     throw err;
   }
   else {
-  Listing.findById(listing.code, function (err, contact) {
-
-    //Check for an error
-    if (err)
-    res.send(err);
-    
-    //Update the building info
-    listing.code = req.body.code;
-    listing.name = req.body.name;
-            
-    if (req.results){
-      listing.coordinates.latitude = req.results.latitude;
-      listing.coordinates.longitude = req.results.longitude;
-      listing.address = req.body.address;
-    }
-
-    });
-    if (!listing.code){
-      throw err;
-    }
-    else{
-      listing.save(function(err) {
-        if(err) {
-          console.log(err);
-          res.status(400).send(err);
-        } else {
-        res.send(listing);
-        console.log(listing)
+    var updated = new Listing(req.body);
+    if (listing.address && req.results){
+      Listing.findOneAndUpdate({_id:listing._id},
+        {
+          'code':updated.code,
+          'name':updated.name,
+          'address':updated.address,
+          'coordinate':{
+            latitude:req.results.latitude,
+            longitude:req.results.longitude,
+          }
+        },
+      function (err) {
+        //Check for an error
+        if (err)
+        res.send(err);
+        else{
+          //new building info output to page
+          res.send(updated);
+          console.log(req)
         }
+
         });
     }
+    else{
+      //if no req.results and address, just update what is available
+      Listing.findOneAndUpdate({_id:listing._id},
+        {
+          'code':updated.code,
+          'name':updated.name,
+          'address':updated.address,
+        },
+      function (err) {
+        //Check for an error
+        if (err)
+        res.send(err);
+        else{
+          //new building info output to page
+          res.send(updated);
+          console.log(req)
+        }
+
+        });
+    }
+    
   }
   /* Replace the listings's properties with the new properties found in req.body */
  
@@ -104,9 +118,10 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
   var listing = req.listing;
   /* Add your code to remove the listins */
-  Listing.findOneAndDelete({ 'code': listing.code}, function (err, listing) {
+  Listing.findByIdAndRemove(listing._id, function (err, listing) {
     if (err) return handleError(err);
     console.log(listing);
+    res.send(listing);
   });
 };
 
