@@ -79,7 +79,7 @@ exports.update = function(req, res) {
         else{
           //new building info output to page
           res.send(updated);
-          console.log(req)
+          //console.log(req)
         }
 
         });
@@ -99,7 +99,7 @@ exports.update = function(req, res) {
         else{
           //new building info output to page
           res.send(updated);
-          console.log(req)
+          //console.log(req)
         }
 
         });
