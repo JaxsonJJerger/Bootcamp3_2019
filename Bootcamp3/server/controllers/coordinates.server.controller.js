@@ -27,7 +27,7 @@ module.exports = function(req, res, next) {
         try{
         if (error)
           throw error;
-        console.log("req \n res")
+        //console.log("req \n res")
         //console.log(body)
         var parsedBody = JSON.parse(body);
         //JSON.parse to get contents. Remember to look at the response's JSON format in open cage data
